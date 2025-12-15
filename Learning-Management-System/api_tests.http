@@ -1,0 +1,131 @@
+@baseUrl = http://localhost:8000/api
+@dosenEmail = dosen@example.com
+@dosenPassword = password
+@mahasiswaEmail = mahasiswa@example.com
+@mahasiswaPassword = password
+@dosenToken = 5|uQdJKKXy8HM0mdMM9p2pwl05wV8MlKKwLxw6fCohb76ad92a
+@mahasiswaToken = 2|n6Wfg7hIQkDLkaPfHwc5GaryDWSw7N5uFEtex810c7ae65c9
+@courseId = 4
+@assignmentId = 10
+
+### 1. Register Dosen
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Pak Dosen",
+    "email": "{{dosenEmail}}",
+    "password": "{{dosenPassword}}",
+    "password_confirmation": "{{dosenPassword}}",
+    "role": "dosen"
+}
+
+### 2. Login Dosen
+# @name loginDosen
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "{{dosenEmail}}",
+    "password": "{{dosenPassword}}"
+}
+
+
+
+### 3. Register Mahasiswa
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Si Mahasiswa",
+    "email": "{{mahasiswaEmail}}",
+    "password": "{{mahasiswaPassword}}",
+    "password_confirmation": "{{mahasiswaPassword}}",
+    "role": "mahasiswa"
+}
+
+### 4. Login Mahasiswa
+# @name loginMahasiswa
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "{{mahasiswaEmail}}",
+    "password": "{{mahasiswaPassword}}"
+}
+
+
+### 5. Create Course (Dosen)
+# @name createCourse
+POST {{baseUrl}}/courses
+Authorization: Bearer {{dosenToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "title": "Pemrograman Web Lanjut",
+    "description": "Mata kuliah backend development dengan Laravel"
+}
+
+
+
+### 6. Get All Courses
+GET {{baseUrl}}/courses
+Authorization: Bearer {{mahasiswaToken}}
+Accept: application/json
+
+### 7. Create Assignment (Dosen)
+# @name createAssignment
+POST {{baseUrl}}/courses/{{courseId}}/assignments
+Authorization: Bearer {{dosenToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "title": "Tugas 1: REST API",
+    "description": "Buatlah REST API sederhana",
+    "deadline": "2025-12-31 23:59:59"
+}
+
+
+
+### 8. Submit Assignment (Mahasiswa)
+# Note: File upload requires multipart/form-data. 
+# In VS Code REST Client, you can use < ./path/to/file
+# Ensure you have a dummy file named 'test.pdf' in the same directory or adjust path.
+POST {{baseUrl}}/assignments/{{assignmentId}}/submit
+Authorization: Bearer {{mahasiswaToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="test.txt"
+Content-Type: text/plain
+
+Ini adalah isi file tugas saya.
+--boundary--
+
+### 9. Get Submissions (Dosen)
+GET {{baseUrl}}/assignments/{{assignmentId}}/submissions
+Authorization: Bearer {{dosenToken}}
+Accept: application/json
+
+### 10. Grade Submission (Dosen)
+# Replace 1 with actual submission ID from previous request if needed
+PUT {{baseUrl}}/submissions/1/grade
+Authorization: Bearer {{dosenToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "grade": 90,
+    "feedback": "Kerja bagus!"
+}
+
+### 11. Logout Dosen
+POST {{baseUrl}}/logout
+Authorization: Bearer {{dosenToken}}
+Accept: application/json
